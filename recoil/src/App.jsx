@@ -1,8 +1,8 @@
 // context API
 
-import { useEffect } from "react";
-import { useState, memo } from "react";
-import count from "./store/atom/counter";
+import { useRecoilValue, useSetRecoilState , RecoilRoot } from "recoil"
+import { counterAtom ,evenSelectorAtom} from "./store/atom/counter";
+
 
 // import { useContext } from "react";
 // import { createContext, useState } from "react";
@@ -138,54 +138,106 @@ import count from "./store/atom/counter";
 
 // memo
 
+// export default function App() {
+//   return (
+//     <div>
+//       <Counter />
+//     </div>
+//   );
+// }
+
+// function Counter() {
+//   const [count, setCount] = useState(0);
+
+//   return (
+//     <>
+//       <Increase setCount={setCount} />
+//       <Decrease setCount={setCount} />
+//       <Value count={count} setCount={setCount} />
+//     </>
+//   );
+// }
+
+// const Increase = memo(function ({ setCount }) {
+//   return (
+//     <button
+//       onClick={() => {
+//         setCount((count) => count + 1);
+//       }}
+//     >
+//       Increase
+//     </button>
+//   );
+// });
+
+// const Decrease = memo(function ({ setCount }) {
+//   return (
+//     <button
+//       onClick={() => {
+//         setCount((count) => count - 1);
+//       }}
+//     >
+//       Decrease
+//     </button>
+//   );
+// });
+
+// const Value = memo(function ({ count }) {
+//   return (
+//     <>
+//       <p>Count: {count}</p>
+//     </>
+//   );
+// });
+
+
+//////////////////////////////////////////////////////////////
+
+// selectors -> Even/Odd
+
 export default function App() {
+
+  return (
+    <RecoilRoot>
+      <Button />
+      <Counter />
+      <IsEven />
+    </RecoilRoot>
+  )
+}
+
+function Button() {
+  const setCount = useSetRecoilState(counterAtom);
+
   return (
     <div>
-      <Counter />
+      <button onClick={() => {
+        setCount(c => c + 1);
+      }}>Increase</button>
+
+      <button onClick={() => {
+        setCount(c => c - 1);
+      }}>Decrease</button>
     </div>
-  );
+  )
 }
 
-function Counter() {
-  const [count, setCount] = useState(0);
+const Counter = () => {
+  const count = useRecoilValue(counterAtom);
+
+  return (
+    <div>
+      count: {count}
+    </div>
+  )
+}
+
+const IsEven = () => {
+  const evenVal = useRecoilValue(evenSelectorAtom);
 
   return (
     <>
-      <Increase setCount={setCount} />
-      <Decrease setCount={setCount} />
-      <Value count={count} setCount={setCount} />
+      { evenVal ? "Even" : "Odd" }
     </>
-  );
+  )
 }
-
-const Increase = memo(function ({ setCount }) {
-  return (
-    <button
-      onClick={() => {
-        setCount((count) => count + 1);
-      }}
-    >
-      Increase
-    </button>
-  );
-});
-
-const Decrease = memo(function ({ setCount }) {
-  return (
-    <button
-      onClick={() => {
-        setCount((count) => count - 1);
-      }}
-    >
-      Decrease
-    </button>
-  );
-});
-
-const Value = memo(function ({ count }) {
-  return (
-    <>
-      <p>Count: {count}</p>
-    </>
-  );
-});
