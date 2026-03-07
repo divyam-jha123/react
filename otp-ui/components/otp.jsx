@@ -12,6 +12,17 @@ export function Otp() {
       return;
     }
 
+    for (let i = 0; i < index; i++){
+      if (otp[i] === "") {
+        const newOtp = [...otp];
+        newOtp[index] = "";
+        setOtp(newOtp);
+
+        inputs.current[i].focus();
+        return;
+      }
+    }
+
     value = value.replace(/[^0-9]/g, "");
 
     if (index !== 0 && otp.every((digit) => digit === "")) {
@@ -40,7 +51,7 @@ export function Otp() {
       if (otp[index]) {
         newOtp[index] = "";
         setOtp(newOtp);
-       } else if(index > 0){
+       } else if(index > 0 && !otp[index]){
         newOtp[index - 1] = "";
         setOtp(newOtp);
         inputs.current[index - 1].focus();
@@ -56,7 +67,7 @@ export function Otp() {
     <div className="text-center flex flex-col gap-10 h-screen justify-center">
       <div className="flex gap-10 justify-center">
 
-        {Array(6).fill("").map((x, index) => <SubOtpBox
+        {otp.map((x, index) => <SubOtpBox
           key={index}
           onChange={(e) => HandleChange(e.target.value, index)}
           onKeyDown={(e) => HandleKeyDown(index, e)}
@@ -64,6 +75,7 @@ export function Otp() {
           maxLength={1}
           inputMode="numeric"
           pattern="[0-9]*"
+          value={otp[index]}
         />)}
 
       </div>
@@ -74,10 +86,11 @@ export function Otp() {
   );
 }
 
-const SubOtpBox = ({ onChange, onKeyDown, forwardref , maxLength , inputMode , pattern }) => {
+const SubOtpBox = ({ value ,onChange, onKeyDown, forwardref , maxLength , inputMode , pattern }) => {
   return (
     <div>
       <input
+        value={value}
         onChange={onChange}
         onKeyDown={onKeyDown}
         ref={forwardref}
