@@ -12,10 +12,11 @@ export function Otp() {
       return;
     }
 
-    if (value && !/^\d+$/.test(value)) return;
+    value = value.replace(/[^0-9]/g, "");
 
-    if (index !== 0 && otp == ["", "", "", "", "", ""]) {
+    if (index !== 0 && otp.every((digit) => digit === "")) {
       inputs.current[0].focus();
+      return;
     }
 
     const newOtp = [...otp];
@@ -32,46 +33,39 @@ export function Otp() {
   };
 
   const HandleKeyDown = (index, e) => {
-    if (e.key === "Backspace" && index > 0 && !otp[index]) {
-      inputs.current[index - 1].focus();
-      setDisabled(true);
+    
+    const newOtp = [...otp];
+
+    if (e.key === "Backspace") {
+      if (otp[index]) {
+        newOtp[index] = "";
+        setOtp(newOtp);
+       } else if(index > 0){
+        newOtp[index - 1] = "";
+        setOtp(newOtp);
+        inputs.current[index - 1].focus();
+      }
     }
+
+    const allFilled = newOtp.every((digit) => digit !== "");
+    setDisabled(!allFilled);
       
   };
 
   return (
     <div className="text-center flex flex-col gap-10 h-screen justify-center">
       <div className="flex gap-10 justify-center">
-        <SubOtpBox
-          onChange={(e) => HandleChange(e.target.value, 0)}
-          onKeyDown={(e) => HandleKeyDown(0, e)}
-          forwardref={(el) => (inputs.current[0] = el)}
-        />
-        <SubOtpBox
-          onChange={(e) => HandleChange(e.target.value, 1)}
-          onKeyDown={(e) => HandleKeyDown(1, e)}
-          forwardref={(el) => (inputs.current[1] = el)}
-        />
-        <SubOtpBox
-          onChange={(e) => HandleChange(e.target.value, 2)}
-          onKeyDown={(e) => HandleKeyDown(2, e)}
-          forwardref={(el) => (inputs.current[2] = el)}
-        />
-        <SubOtpBox
-          onChange={(e) => HandleChange(e.target.value, 3)}
-          onKeyDown={(e) => HandleKeyDown(3, e)}
-          forwardref={(el) => (inputs.current[3] = el)}
-        />
-        <SubOtpBox
-          onChange={(e) => HandleChange(e.target.value, 4)}
-          onKeyDown={(e) => HandleKeyDown(4, e)}
-          forwardref={(el) => (inputs.current[4] = el)}
-        />
-        <SubOtpBox
-          onChange={(e) => HandleChange(e.target.value, 5)}
-          onKeyDown={(e) => HandleKeyDown(5, e)}
-          forwardref={(el) => (inputs.current[5] = el)}
-        />
+
+        {Array(6).fill("").map((x, index) => <SubOtpBox
+          key={index}
+          onChange={(e) => HandleChange(e.target.value, index)}
+          onKeyDown={(e) => HandleKeyDown(index, e)}
+          forwardref={(el) => (inputs.current[index] = el)}
+          maxLength={1}
+          inputMode="numeric"
+          pattern="[0-9]*"
+        />)}
+
       </div>
       <div>
         <Button disabled={disabled} />
@@ -80,7 +74,7 @@ export function Otp() {
   );
 }
 
-const SubOtpBox = ({ onChange, onKeyDown, forwardref }) => {
+const SubOtpBox = ({ onChange, onKeyDown, forwardref , maxLength , inputMode , pattern }) => {
   return (
     <div>
       <input
@@ -88,6 +82,9 @@ const SubOtpBox = ({ onChange, onKeyDown, forwardref }) => {
         onKeyDown={onKeyDown}
         ref={forwardref}
         className="w-12 h-15 text-center text-xl border rounded-lg outline-none "
+        maxLength={maxLength}
+        inputMode={inputMode}
+        pattern={pattern}
       ></input>
     </div>
   );
